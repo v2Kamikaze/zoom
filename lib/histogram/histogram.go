@@ -6,7 +6,7 @@ import (
 	"log"
 	"math"
 
-	"github.com/v2Kamikaze/zoom/lib/intensity"
+	"github.com/v2Kamikaze/zoom/lib/utils"
 )
 
 type HistogramChannel = uint8
@@ -25,7 +25,6 @@ type Histogram struct {
 	lChannel []uint
 }
 
-// FromImage returns a new Histogram with all colors channel from given image.
 func FromImage(img image.Image) *Histogram {
 	bounds := img.Bounds()
 	histogramR := make([]uint, 256)
@@ -127,7 +126,7 @@ func (h *Histogram) EqualizeWithChannel(img image.Image, channel HistogramChanne
 				newG = g8
 				newB = uint8(cdf[b8])
 			case L:
-				luminance := intensity.ToGrayRGB(r, g, b)
+				luminance := utils.ToGrayRGB(r, g, b)
 				newGray := uint8(cdf[luminance])
 				newR, newG, newB = newGray, newGray, newGray
 			}

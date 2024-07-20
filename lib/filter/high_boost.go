@@ -5,45 +5,27 @@ import (
 	"image/color"
 
 	"github.com/v2Kamikaze/zoom/lib/convolution"
+	"github.com/v2Kamikaze/zoom/lib/utils"
 )
 
-func HighBoost(img image.Image, kernelSize uint, boostFactor float64) image.Image {
-
-	// Gera o kernel Laplaciano
-	laplacianKernel := Laplacian(kernelSize)
-
-	// Convolui a imagem com o kernel Laplaciano para obter a imagem de alta frequência
-	laplacianImg := convolution.Convolve(img, laplacianKernel)
-
-	// Cria a imagem resultante
+func HighBoost(img image.Image, k float64, smoothKernel [][]float64) image.Image {
 	bounds := img.Bounds()
 	highBoostImg := image.NewRGBA(bounds)
 
+	smoothedImg := convolution.Convolve(img, smoothKernel)
+
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			origColor := img.At(x, y)
-			origR, origG, origB, origA := origColor.RGBA()
-			convColor := laplacianImg.At(x, y)
-			convR, convG, convB, _ := convColor.RGBA()
+			origR, origG, origB, _ := img.At(x, y).RGBA()
+			smoothR, smoothG, smoothB, _ := smoothedImg.At(x, y).RGBA()
 
-			// Calcula a imagem resultante com o fator de aumento
-			r := uint8(clamp(float64(origR>>8)+boostFactor*float64(convR>>8), 0, 255))
-			g := uint8(clamp(float64(origG>>8)+boostFactor*float64(convG>>8), 0, 255))
-			b := uint8(clamp(float64(origB>>8)+boostFactor*float64(convB>>8), 0, 255))
+			hbR := utils.Clamp(float64(origR>>8)+k*(float64(origR>>8)-float64(smoothR>>8)), 0, 255)
+			hbG := utils.Clamp(float64(origG>>8)+k*(float64(origG>>8)-float64(smoothG>>8)), 0, 255)
+			hbB := utils.Clamp(float64(origB>>8)+k*(float64(origB>>8)-float64(smoothB>>8)), 0, 255)
 
-			highBoostImg.Set(x, y, color.RGBA{R: r, G: g, B: b, A: uint8(origA >> 8)})
+			highBoostImg.Set(x, y, color.RGBA{R: uint8(hbR), G: uint8(hbG), B: uint8(hbB), A: 255})
 		}
 	}
 
 	return highBoostImg
-}
-
-func clamp(value, min, max float64) float64 {
-	if value < min {
-		return min
-	}
-	if value > max {
-		return max
-	}
-	return value
 }

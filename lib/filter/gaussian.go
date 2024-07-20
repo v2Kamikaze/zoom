@@ -2,7 +2,7 @@ package filter
 
 import "math"
 
-func Gaussian(size int, sigma float64) [][]float64 {
+func Gaussian(size uint, sigma float64) [][]float64 {
 	if size%2 == 0 {
 		panic("O tamanho do kernel deve ser ímpar")
 	}
@@ -13,7 +13,7 @@ func Gaussian(size int, sigma float64) [][]float64 {
 	}
 
 	sum := 0.0
-	mid := size / 2
+	mid := int(size / 2)
 	for y := -mid; y <= mid; y++ {
 		for x := -mid; x <= mid; x++ {
 			value := (1 / (2 * math.Pi * sigma * sigma)) * math.Exp(-(float64(x*x+y*y))/(2*sigma*sigma))

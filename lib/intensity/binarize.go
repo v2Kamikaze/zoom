@@ -3,6 +3,8 @@ package intensity
 import (
 	"image"
 	"image/color"
+
+	"github.com/v2Kamikaze/zoom/lib/utils"
 )
 
 func Binarize(img image.Image, threshold uint8) image.Image {
@@ -14,7 +16,7 @@ func Binarize(img image.Image, threshold uint8) image.Image {
 			c := img.At(x, y)
 			r, g, b, _ := c.RGBA()
 
-			gray := ToGrayRGB(r, g, b)
+			gray := utils.ToGrayRGB(r, g, b)
 
 			var binColor color.RGBA
 			if gray > threshold {

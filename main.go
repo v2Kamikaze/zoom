@@ -1,70 +1,56 @@
 package main
 
 import (
-	"github.com/v2Kamikaze/zoom/lib/convolution"
+	"fmt"
+
 	"github.com/v2Kamikaze/zoom/lib/filter"
 	"github.com/v2Kamikaze/zoom/lib/histogram"
 	"github.com/v2Kamikaze/zoom/lib/imageio"
-	"github.com/v2Kamikaze/zoom/lib/intensity"
+	"github.com/v2Kamikaze/zoom/lib/zoom"
 )
 
-var meanKernel = filter.Mean(9)
-
-// TODO: mudar logica para png, pois o fundo fica preto
-var gaussianKernel = filter.Gaussian(9, 1.6)
-var laplacianKernel = filter.Laplacian(9)
+type imageInfo struct {
+	name string
+	ext  string
+}
 
 func main() {
-	img := imageio.OpenImage("./assets/zero.png")
 
-	negImg := intensity.Negative(img)
-	gammImg := intensity.GammaCorrection(img, 2.2, 1.0)
-	binImg := intensity.Binarize(img, 128)
-	meanImg := convolution.Convolve(img, meanKernel)
-	gaussImg := convolution.Convolve(img, gaussianKernel)
-	laplaImg := convolution.Convolve(img, laplacianKernel)
+	infos := []imageInfo{
+		{name: "zero", ext: "png"},
+		{name: "go", ext: "jpg"},
+	}
 
-	hist := histogram.FromImage(img)
-	imgHistR := hist.EqualizeWithChannel(img, histogram.R)
-	imgHistG := hist.EqualizeWithChannel(img, histogram.G)
-	imgHistB := hist.EqualizeWithChannel(img, histogram.B)
-	imgHistL := hist.EqualizeWithChannel(img, histogram.L)
+	for _, info := range infos {
 
-	imageio.SaveImage("./assets/zero-neg.png", negImg)
-	imageio.SaveImage("./assets/zero-gamma.png", gammImg)
-	imageio.SaveImage("./assets/zero-bin.png", binImg)
-	imageio.SaveImage("./assets/zero-mean.png", meanImg)
-	imageio.SaveImage("./assets/zero-gauss.png", gaussImg)
-	imageio.SaveImage("./assets/zero-laplace.png", laplaImg)
-	imageio.SaveImage("./assets/zero-hist-r.png", imgHistR)
-	imageio.SaveImage("./assets/zero-hist-g.png", imgHistG)
-	imageio.SaveImage("./assets/zero-hist-b.png", imgHistB)
-	imageio.SaveImage("./assets/zero-hist-l.png", imgHistL)
+		img := imageio.OpenImage(fmt.Sprintf("./assets/%s.%s", info.name, info.ext))
 
-	img = imageio.OpenImage("./assets/go.jpg")
+		negImg := zoom.ApplyNeg(img)
+		gammImg := zoom.ApplyGamma(img, 2.2, 1.0)
+		binImg := zoom.ApplyBin(img, 128)
+		meanImg := zoom.ApplyMean(img, 5)
+		gaussImg := zoom.ApplyGaussian(img, 5, 1.5)
+		laplaImg := zoom.ApplyLaplacian(img, 5)
+		highBoostImg := zoom.ApplyHighBoost(img, 1.5, filter.Gaussian(5, 1.5))
 
-	negImg = intensity.Negative(img)
-	gammImg = intensity.GammaCorrection(img, 2.2, 1.0)
-	binImg = intensity.Binarize(img, 128)
-	meanImg = convolution.Convolve(img, meanKernel)
-	gaussImg = convolution.Convolve(img, gaussianKernel)
-	laplaImg = convolution.Convolve(img, laplacianKernel)
+		hist := histogram.FromImage(img)
+		imgHistR := hist.EqualizeWithChannel(img, histogram.R)
+		imgHistG := hist.EqualizeWithChannel(img, histogram.G)
+		imgHistB := hist.EqualizeWithChannel(img, histogram.B)
+		imgHistL := hist.EqualizeWithChannel(img, histogram.L)
 
-	hist = histogram.FromImage(img)
-	imgHistR = hist.EqualizeWithChannel(img, histogram.R)
-	imgHistG = hist.EqualizeWithChannel(img, histogram.G)
-	imgHistB = hist.EqualizeWithChannel(img, histogram.B)
-	imgHistL = hist.EqualizeWithChannel(img, histogram.L)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-neg.%s", info.name, info.ext), negImg)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-gamma.%s", info.name, info.ext), gammImg)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-bin.%s", info.name, info.ext), binImg)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-mean.%s", info.name, info.ext), meanImg)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-gauss.%s", info.name, info.ext), gaussImg)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-laplace.%s", info.name, info.ext), laplaImg)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-high-boost.%s", info.name, info.ext), highBoostImg)
 
-	imageio.SaveImage("./assets/go-neg.jpg", negImg)
-	imageio.SaveImage("./assets/go-gamma.jpg", gammImg)
-	imageio.SaveImage("./assets/go-bin.jpg", binImg)
-	imageio.SaveImage("./assets/go-mean.jpg", meanImg)
-	imageio.SaveImage("./assets/go-gauss.jpg", gaussImg)
-	imageio.SaveImage("./assets/go-laplace.jpg", laplaImg)
-	imageio.SaveImage("./assets/go-hist-r.jpg", imgHistR)
-	imageio.SaveImage("./assets/go-hist-g.jpg", imgHistG)
-	imageio.SaveImage("./assets/go-hist-b.jpg", imgHistB)
-	imageio.SaveImage("./assets/go-hist-l.jpg", imgHistL)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-hist-r.%s", info.name, info.ext), imgHistR)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-hist-g.%s", info.name, info.ext), imgHistG)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-hist-b.%s", info.name, info.ext), imgHistB)
+		imageio.SaveImage(fmt.Sprintf("./assets/%s-hist-l.%s", info.name, info.ext), imgHistL)
+	}
 
 }
