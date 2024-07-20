@@ -8,9 +8,11 @@ import (
 	"github.com/v2Kamikaze/zoom/lib/intensity"
 )
 
-var meanKernel = filter.Mean(5)
-var gaussianKernel = filter.Gaussian(5, 1.6)
-var laplacianKernel = filter.Laplacian(5)
+var meanKernel = filter.Mean(9)
+
+// TODO: mudar logica para png, pois o fundo fica preto
+var gaussianKernel = filter.Gaussian(9, 1.6)
+var laplacianKernel = filter.Laplacian(9)
 
 func main() {
 	img := imageio.OpenImage("./assets/zero.png")
