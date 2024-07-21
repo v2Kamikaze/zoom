@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/v2Kamikaze/zoom/lib/background"
 	"github.com/v2Kamikaze/zoom/lib/imageio"
@@ -10,6 +13,10 @@ import (
 )
 
 func main() {
+
+	reset()
+
+	time.Sleep(time.Second * 10)
 
 	infos := []struct {
 		name string
@@ -21,13 +28,29 @@ func main() {
 
 	runner := background.NewBackgroundRunner()
 
-	runner.Add(func() {
-
-	})
-
 	for _, info := range infos {
 		img := imageio.OpenImage(fmt.Sprintf("./assets/%s.%s", info.name, info.ext))
 		hist := zoom.FromImage(img)
+
+		runner.Add(func() {
+			scale := zoom.ApplyScaleWithNearestNeighbor(img, 2, 2)
+			imageio.SaveImage(fmt.Sprintf("./assets/%s-scale-neighbor.%s", info.name, info.ext), scale)
+		})
+
+		runner.Add(func() {
+			scale := zoom.ApplyScaleWithBilinear(img, 2, 2)
+			imageio.SaveImage(fmt.Sprintf("./assets/%s-scale-bilinear.%s", info.name, info.ext), scale)
+		})
+
+		runner.Add(func() {
+			rotate := zoom.ApplyRotateWithNearestNeighbor(img, 45)
+			imageio.SaveImage(fmt.Sprintf("./assets/%s-rotate-neighbor.%s", info.name, info.ext), rotate)
+		})
+
+		runner.Add(func() {
+			rotate := zoom.ApplyRotateWithBilinear(img, 45)
+			imageio.SaveImage(fmt.Sprintf("./assets/%s-rotate-bilinear.%s", info.name, info.ext), rotate)
+		})
 
 		runner.Add(func() {
 			sobelXImg := zoom.ApplySobelX(img)
@@ -80,6 +103,11 @@ func main() {
 		})
 
 		runner.Add(func() {
+			sharpenedImg := zoom.ApplySharpening(img, 5)
+			imageio.SaveImage(fmt.Sprintf("./assets/%s-sharpening.%s", info.name, info.ext), sharpenedImg)
+		})
+
+		runner.Add(func() {
 			imgHistR := hist.EqualizeWithChannel(img, zoom.RChannel)
 			imageio.SaveImage(fmt.Sprintf("./assets/%s-hist-r.%s", info.name, info.ext), imgHistR)
 		})
@@ -103,4 +131,21 @@ func main() {
 
 	runner.RunAndWait()
 	runner.Clear()
+}
+
+func reset() {
+	patterns := []string{"./assets/go-*", "./assets/zero-*"}
+
+	for _, pattern := range patterns {
+		files, err := filepath.Glob(pattern)
+		if err != nil {
+			panic(err)
+		}
+		for _, f := range files {
+			if err := os.Remove(f); err != nil {
+				panic(err)
+			}
+		}
+	}
+
 }

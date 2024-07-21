@@ -6,8 +6,25 @@ import (
 	"github.com/v2Kamikaze/zoom/lib/convolution"
 	"github.com/v2Kamikaze/zoom/lib/intensity"
 	"github.com/v2Kamikaze/zoom/lib/kernel"
+	"github.com/v2Kamikaze/zoom/lib/transform"
 	"github.com/v2Kamikaze/zoom/lib/utils"
 )
+
+func ApplyScaleWithBilinear(img image.Image, scaleX float64, scaleY float64) image.Image {
+	return transform.ScaleWithBilinear(img, scaleX, scaleY)
+}
+
+func ApplyScaleWithNearestNeighbor(img image.Image, scaleX float64, scaleY float64) image.Image {
+	return transform.ScaleWithNearestNeighbor(img, scaleX, scaleY)
+}
+
+func ApplyRotateWithNearestNeighbor(img image.Image, angle float64) image.Image {
+	return transform.RotateWithNearestNeighbor(img, angle)
+}
+
+func ApplyRotateWithBilinear(img image.Image, angle float64) image.Image {
+	return transform.RotateWithBilinear(img, angle)
+}
 
 func ApplySobelX(img image.Image) image.Image {
 	imgX := convolution.Convolve(img, kernel.SobelX())
@@ -55,4 +72,8 @@ func ApplyNeg(img image.Image) image.Image {
 
 func ApplyHighBoost(img image.Image, k float64, smoothKernel [][]float64) image.Image {
 	return intensity.HighBoost(img, k, smoothKernel)
+}
+
+func ApplySharpening(img image.Image, kernelSize uint) image.Image {
+	return intensity.Sharpening(img, kernel.Laplacian(kernelSize))
 }
