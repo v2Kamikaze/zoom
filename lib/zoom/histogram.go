@@ -1,4 +1,4 @@
-package histogram
+package zoom
 
 import (
 	"image"
@@ -12,10 +12,10 @@ import (
 type HistogramChannel = uint8
 
 const (
-	R HistogramChannel = iota
-	G
-	B
-	L
+	RChannel HistogramChannel = iota
+	GChannel
+	BChannel
+	LChannel
 )
 
 type Histogram struct {
@@ -42,7 +42,7 @@ func FromImage(img image.Image) *Histogram {
 			histogramG[g8]++
 			histogramB[b8]++
 
-			luminance := uint8(0.299*float64(r8) + 0.587*float64(g8) + 0.114*float64(b8))
+			luminance := utils.ToGrayRGB(r, g, b)
 			histogramLuminance[luminance]++
 
 		}
@@ -79,13 +79,13 @@ func (h *Histogram) EqualizeWithChannel(img image.Image, channel HistogramChanne
 	var selectedHistogram []uint
 
 	switch channel {
-	case R:
+	case RChannel:
 		selectedHistogram = h.RedChannel()
-	case G:
+	case GChannel:
 		selectedHistogram = h.GreenChannel()
-	case B:
+	case BChannel:
 		selectedHistogram = h.BlueChannel()
-	case L:
+	case LChannel:
 		selectedHistogram = h.LuminanceChannel()
 	default:
 		log.Panicf("canal inválido. %d", channel)
@@ -113,19 +113,19 @@ func (h *Histogram) EqualizeWithChannel(img image.Image, channel HistogramChanne
 			var newR, newG, newB uint8
 
 			switch channel {
-			case R:
+			case RChannel:
 				newR = uint8(cdf[r8])
 				newG = g8
 				newB = b8
-			case G:
+			case GChannel:
 				newR = r8
 				newG = uint8(cdf[g8])
 				newB = b8
-			case B:
+			case BChannel:
 				newR = r8
 				newG = g8
 				newB = uint8(cdf[b8])
-			case L:
+			case LChannel:
 				luminance := utils.ToGrayRGB(r, g, b)
 				newGray := uint8(cdf[luminance])
 				newR, newG, newB = newGray, newGray, newGray

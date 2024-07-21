@@ -1,8 +1,8 @@
-package filter
+package kernel
 
 func Mean(size uint) [][]float64 {
 	if size%2 == 0 {
-		panic("O tamanho do kernel deve ser ímpar")
+		panic("o tamanho do kernel deve ser ímpar")
 	}
 
 	kernel := make([][]float64, size)
