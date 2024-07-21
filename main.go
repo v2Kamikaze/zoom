@@ -9,14 +9,12 @@ import (
 	"github.com/v2Kamikaze/zoom/lib/zoom"
 )
 
-type imageInfo struct {
-	name string
-	ext  string
-}
-
 func main() {
 
-	infos := []imageInfo{
+	infos := []struct {
+		name string
+		ext  string
+	}{
 		{name: "zero", ext: "png"},
 		{name: "go", ext: "jpg"},
 	}
@@ -30,6 +28,21 @@ func main() {
 	for _, info := range infos {
 		img := imageio.OpenImage(fmt.Sprintf("./assets/%s.%s", info.name, info.ext))
 		hist := zoom.FromImage(img)
+
+		runner.Add(func() {
+			sobelXImg := zoom.ApplySobelX(img)
+			imageio.SaveImage(fmt.Sprintf("./assets/%s-sobel-x.%s", info.name, info.ext), sobelXImg)
+		})
+
+		runner.Add(func() {
+			sobelYImg := zoom.ApplySobelY(img)
+			imageio.SaveImage(fmt.Sprintf("./assets/%s-sobel-y.%s", info.name, info.ext), sobelYImg)
+		})
+
+		runner.Add(func() {
+			sobelImg := zoom.ApplySobel(img)
+			imageio.SaveImage(fmt.Sprintf("./assets/%s-sobel-full.%s", info.name, info.ext), sobelImg)
+		})
 
 		runner.Add(func() {
 			negImg := zoom.ApplyNeg(img)

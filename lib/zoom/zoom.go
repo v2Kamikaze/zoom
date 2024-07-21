@@ -6,7 +6,28 @@ import (
 	"github.com/v2Kamikaze/zoom/lib/convolution"
 	"github.com/v2Kamikaze/zoom/lib/intensity"
 	"github.com/v2Kamikaze/zoom/lib/kernel"
+	"github.com/v2Kamikaze/zoom/lib/utils"
 )
+
+func ApplySobelX(img image.Image) image.Image {
+	imgX := convolution.Convolve(img, kernel.SobelX())
+	norm := utils.NormalizeImage(imgX)
+	return norm
+}
+
+func ApplySobelY(img image.Image) image.Image {
+	imgY := convolution.Convolve(img, kernel.SobelY())
+	norm := utils.NormalizeImage(imgY)
+	return norm
+}
+
+func ApplySobel(img image.Image) image.Image {
+	imgX := convolution.Convolve(img, kernel.SobelX())
+	normX := utils.NormalizeImage(imgX)
+	imgY := convolution.Convolve(img, kernel.SobelY())
+	normY := utils.NormalizeImage(imgY)
+	return kernel.Magnitude(normX, normY)
+}
 
 func ApplyGaussian(img image.Image, kernelSize uint, sigma float64) image.Image {
 	return convolution.Convolve(img, kernel.Gaussian(kernelSize, sigma))
