@@ -52,9 +52,9 @@ func Convolve(img image.Image, kernel [][]float64) image.Image {
 			b := uint8(utils.Clamp(bSum, 0, 255))
 
 			// Verificar se esse é o melhor caminho para não perder a transparência
-			a := uint8(utils.Clamp(aSum, 0, 255))
+			_ = uint8(utils.Clamp(aSum, 0, 255))
 
-			convImg.Set(x, y, color.RGBA{R: r, G: g, B: b, A: a})
+			convImg.Set(x, y, color.RGBA{R: r, G: g, B: b, A: 255})
 		}
 	}
 
