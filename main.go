@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/v2Kamikaze/zoom/lib/background"
 	"github.com/v2Kamikaze/zoom/lib/imageio"
@@ -15,8 +14,6 @@ import (
 func main() {
 
 	reset()
-
-	time.Sleep(time.Second * 10)
 
 	infos := []struct {
 		name string

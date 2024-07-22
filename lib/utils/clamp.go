@@ -1,6 +1,8 @@
 package utils
 
-func Clamp(value, min, max float64) float64 {
+import "cmp"
+
+func Clamp[T cmp.Ordered](value, min, max T) T {
 	if value < min {
 		return min
 	}
