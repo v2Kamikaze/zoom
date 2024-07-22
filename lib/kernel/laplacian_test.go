@@ -10,13 +10,13 @@ import (
 func TestLaplacian(t *testing.T) {
 
 	t.Run("3x3 laplacian", func(t *testing.T) {
-		got := [][]float64{
+		want := [][]float64{
 			{-1, -1, -1},
 			{-1, 8, -1},
 			{-1, -1, -1},
 		}
 
-		want := kernel.Laplacian(3)
+		got := kernel.Laplacian(3)
 
 		assert.Equal(t, want, got, "expect %+v, got %+v", want, got)
 	})

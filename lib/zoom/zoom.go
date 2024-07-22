@@ -4,10 +4,9 @@ import (
 	"image"
 
 	"github.com/v2Kamikaze/zoom/lib/convolution"
-	"github.com/v2Kamikaze/zoom/lib/intensity"
+	"github.com/v2Kamikaze/zoom/lib/effect"
 	"github.com/v2Kamikaze/zoom/lib/kernel"
 	"github.com/v2Kamikaze/zoom/lib/transform"
-	"github.com/v2Kamikaze/zoom/lib/utils"
 )
 
 func ApplyScaleWithBilinear(img image.Image, scaleX float64, scaleY float64) image.Image {
@@ -28,22 +27,22 @@ func ApplyRotateWithBilinear(img image.Image, angle float64) image.Image {
 
 func ApplySobelX(img image.Image) image.Image {
 	imgX := convolution.Convolve(img, kernel.SobelX())
-	norm := utils.NormalizeImage(imgX)
+	norm := effect.Normalize(imgX)
 	return norm
 }
 
 func ApplySobelY(img image.Image) image.Image {
 	imgY := convolution.Convolve(img, kernel.SobelY())
-	norm := utils.NormalizeImage(imgY)
+	norm := effect.Normalize(imgY)
 	return norm
 }
 
 func ApplySobel(img image.Image) image.Image {
 	imgX := convolution.Convolve(img, kernel.SobelX())
-	normX := utils.NormalizeImage(imgX)
+	normX := effect.Normalize(imgX)
 	imgY := convolution.Convolve(img, kernel.SobelY())
-	normY := utils.NormalizeImage(imgY)
-	return kernel.Magnitude(normX, normY)
+	normY := effect.Normalize(imgY)
+	return effect.Magnitude(normX, normY)
 }
 
 func ApplyGaussian(img image.Image, kernelSize uint, sigma float64) image.Image {
@@ -59,21 +58,21 @@ func ApplyMean(img image.Image, kernelSize uint) image.Image {
 }
 
 func ApplyBin(img image.Image, threshold uint8) image.Image {
-	return intensity.Binarize(img, threshold)
+	return effect.Binarize(img, threshold)
 }
 
 func ApplyGamma(img image.Image, gamma float64, c float64) image.Image {
-	return intensity.GammaCorrection(img, gamma, c)
+	return effect.GammaCorrection(img, gamma, c)
 }
 
 func ApplyNeg(img image.Image) image.Image {
-	return intensity.Negative(img)
+	return effect.Negative(img)
 }
 
 func ApplyHighBoost(img image.Image, k float64, smoothKernel [][]float64) image.Image {
-	return intensity.HighBoost(img, k, smoothKernel)
+	return effect.HighBoost(img, k, smoothKernel)
 }
 
 func ApplySharpening(img image.Image, kernelSize uint) image.Image {
-	return intensity.Sharpening(img, kernel.Laplacian(kernelSize))
+	return effect.Sharpening(img, kernel.Laplacian(kernelSize))
 }
