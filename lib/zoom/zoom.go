@@ -75,5 +75,5 @@ func ApplyHighBoost(img image.Image, k float64, smoothKernel [][]float64) image.
 }
 
 func ApplySharpening(img image.Image, kernelSize uint) image.Image {
-	return intensity.Sharpening2(img, kernel.Laplacian(kernelSize))
+	return intensity.Sharpening(img, kernel.Laplacian(kernelSize))
 }
