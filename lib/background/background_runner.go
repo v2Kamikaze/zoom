@@ -2,6 +2,7 @@ package background
 
 import (
 	"log"
+	"runtime/debug"
 	"sync"
 	"time"
 )
@@ -28,7 +29,7 @@ func (t *BackgroundRunner) RunAndWait() {
 
 	rec := func(taskNumber int) {
 		if r := recover(); r != nil {
-			log.Printf("erro ao processar tarefa '%d'\n", taskNumber)
+			log.Printf("erro ao processar tarefa [%d]. %+v\n stack:\n%s", taskNumber, r, string(debug.Stack()))
 		}
 	}
 
@@ -41,7 +42,7 @@ func (t *BackgroundRunner) RunAndWait() {
 
 			t.tasks[i]()
 
-			log.Printf("Tarefa %d demorou '%f' segundos\n", i, time.Since(now).Seconds())
+			log.Printf("tarefa de id [%3d] demorou %f segundos\n", i, time.Since(now).Seconds())
 		}()
 	}
 

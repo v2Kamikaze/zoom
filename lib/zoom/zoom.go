@@ -9,6 +9,14 @@ import (
 	"github.com/v2Kamikaze/zoom/lib/transform"
 )
 
+func ApplyInvFourier(img image.Image) image.Image {
+	return effect.CalculateInverseFourier(img)
+}
+
+func ApplyFourier(img image.Image) image.Image {
+	return effect.CalculateFourier(img)
+}
+
 func ApplyScaleWithBilinear(img image.Image, scaleX float64, scaleY float64) image.Image {
 	return transform.ScaleWithBilinear(img, scaleX, scaleY)
 }
