@@ -3,6 +3,8 @@ package effect
 import (
 	"image"
 	"image/color"
+
+	"github.com/v2Kamikaze/zoom/lib/convert"
 )
 
 func Negative(img image.Image) image.Image {
@@ -20,9 +22,7 @@ func Negative(img image.Image) image.Image {
 			normalizedB := uint8(b >> 8)
 			normalizedA := uint8(a >> 8)
 
-			negR := 255 - normalizedR
-			negG := 255 - normalizedG
-			negB := 255 - normalizedB
+			negR, negG, negB := convert.NegativeRGB(normalizedR, normalizedG, normalizedB)
 
 			negColor := color.RGBA{R: negR, G: negG, B: negB, A: normalizedA}
 			negImg.Set(x, y, negColor)
