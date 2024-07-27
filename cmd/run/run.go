@@ -18,7 +18,7 @@ func main() {
 	effects.Post("/mean", handler.MeanImage)
 	effects.Post("/bin", handler.BinImage)
 	effects.Post("/gamma", handler.GammaImage)
-	effects.Post("/highboost", handler.HighBoostImage)
+	effects.Post("/high-boost", handler.HighBoostImage)
 	effects.Post("/sharpening", handler.SharpeningImage)
 
 	transform := app.Group("/api/transform")
