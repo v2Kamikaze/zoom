@@ -34,19 +34,22 @@ go mod tidy
 Para rodar o servidor:
 
 ```bash
-go run ./cmd/run .
+cd ./backend
+go run ./cmd/server .
 ```
 
 Para rodar concorrentemente todos os filtros nas imagens presentes em `assets`(bom para testar):
 
 ```bash
-go run cmd/batch .
+cd ./backend
+go run ./cmd/batch .
 ```
 
 Para limpar as imagens geradas por `batch` em `assets`:
 
 ```bash
-go run cmd/reset .
+cd ./backend
+go run ./cmd/reset .
 ```
 
 ### Rotas implementadas até agora:
