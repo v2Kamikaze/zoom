@@ -14,7 +14,7 @@ func ApplyInvFourier(img image.Image) image.Image {
 }
 
 func ApplyFourier(img image.Image) image.Image {
-	return effect.CalculateFourier(img)
+	return effect.CalculateCenterFourier(img)
 }
 
 func ApplyScaleWithBilinear(img image.Image, scaleX float64, scaleY float64) image.Image {
