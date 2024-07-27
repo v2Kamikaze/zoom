@@ -28,9 +28,9 @@ func main() {
 		hist := zoom.FromImage(img)
 
 		// runner.Add(func() {
-		// 	paddImg := utils.PadImagePow2(img)
-		// 	fourier := zoom.ApplyFourier(paddImg)
-		// 	invFourier := zoom.ApplyInvFourier(fourier)
+		// 	//paddImg := utils.PadImagePow2(img)
+		// 	//fourier := zoom.ApplyFourier(paddImg)
+		// 	invFourier := zoom.ApplyInvFourier(img)
 		// 	imageio.SaveImage(fmt.Sprintf("./assets/%s-inv-fourier.%s", info.name, info.ext), invFourier)
 		// })
 

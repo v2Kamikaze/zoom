@@ -84,9 +84,6 @@ func CalculateFourier(img image.Image) image.Image {
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
 			mag := magnitude[y*width+x]
-			if mag > 255 {
-				mag = 255
-			}
 			resultImg.SetGray(x, y, color.Gray{Y: uint8(mag)})
 		}
 	}

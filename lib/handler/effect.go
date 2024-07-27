@@ -120,3 +120,9 @@ func SharpeningImage(c *fiber.Ctx) error {
 		return zoom.ApplySharpening(img, uint(kernelSize))
 	})
 }
+
+// FourierImage calcula a Transformada Discreta de Fourier (DFT) de uma imagem,
+// desloca o espectro para o centro e aplica uma escala logarítmica para a visualização.
+func FourierImage(c *fiber.Ctx) error {
+	return ProcessImage(c, zoom.ApplyFourier)
+}

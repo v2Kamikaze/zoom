@@ -64,6 +64,7 @@ go run cmd/reset .
 | POST   | /api/effects/gamma                     | query={g: Valor do gamma (padrão 2.0), c: Constante (padrão 1.0)}                               | Nova imagem com correção gama aplicada                            |
 | POST   | /api/effects/high-boost                | query={ks: Tamanho do kernel (padrão 3), s: Sigma (padrão 1.0), k: Fator de boost (padrão 1.5)} | Nova imagem com filtro High Boost aplicado                        |
 | POST   | /api/effects/sharpening                | query={ks: Tamanho do kernel (padrão 3)}                                                        | Nova imagem com filtro de nitidez aplicado                        |
+| POST   | /api/effects/fourier                   | query={}                                                                                        | Nova imagem com a transformada de Fourier aplicada                |
 | POST   | /api/transform/scale/bilinear          | query={x: Escala X (padrão 1), y: Escala Y (padrão 1)}                                          | Nova imagem escalada com interpolação bilinear                    |
 | POST   | /api/transform/scale/nearest-neighbor  | query={x: Escala X (padrão 1), y: Escala Y (padrão 1)}                                          | Nova imagem escalada com interpolação por vizinho mais próximo    |
 | POST   | /api/transform/rotate/bilinear         | query={a: Ângulo de rotação (padrão 0)}                                                         | Nova imagem rotacionada com interpolação bilinear                 |

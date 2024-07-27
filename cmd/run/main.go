@@ -20,6 +20,7 @@ func main() {
 	effects.Post("/gamma", handler.GammaImage)
 	effects.Post("/high-boost", handler.HighBoostImage)
 	effects.Post("/sharpening", handler.SharpeningImage)
+	effects.Post("/fourier", handler.FourierImage)
 
 	transform := app.Group("/api/transform")
 	transform.Post("/scale/bilinear", handler.ScaleImageBilinear)

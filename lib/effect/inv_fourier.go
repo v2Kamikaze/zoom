@@ -7,15 +7,13 @@ import (
 	"math/cmplx"
 )
 
-// IFFT2D realiza a Transformada Inversa de Fourier 2D.
+// IFFT2D realiza a Transformada Rápida de Fourier Inversa 2D.
 func IFFT2D(input []complex128, width, height int) []complex128 {
-	// IFFT em cada linha
 	for y := 0; y < height; y++ {
 		start := y * width
 		IFFT1D(input[start : start+width])
 	}
 
-	// IFFT em cada coluna
 	for x := 0; x < width; x++ {
 		column := make([]complex128, height)
 		for y := 0; y < height; y++ {
@@ -27,17 +25,21 @@ func IFFT2D(input []complex128, width, height int) []complex128 {
 		}
 	}
 
+	// Dividir cada valor pelo número total de elementos para normalizar
+	for i := range input {
+		input[i] /= complex(float64(width*height), 0)
+	}
+
 	return input
 }
 
-// IFFT1D realiza a Transformada Inversa de Fourier 1D.
+// IFFT1D realiza a Transformada Rápida de Fourier Inversa 1D.
 func IFFT1D(input []complex128) {
 	n := len(input)
 	if n <= 1 {
 		return
 	}
 
-	// Divida a entrada em duas partes
 	even := make([]complex128, n/2)
 	odd := make([]complex128, n/2)
 	for i := 0; i < n/2; i++ {
@@ -45,59 +47,58 @@ func IFFT1D(input []complex128) {
 		odd[i] = input[i*2+1]
 	}
 
-	// Realize IFFT recursivamente
 	IFFT1D(even)
 	IFFT1D(odd)
 
-	// Combine os resultados
 	for i := 0; i < n/2; i++ {
-		t := cmplx.Exp(complex(0, -2*math.Pi*float64(i)/float64(n))) * odd[i]
+		t := cmplx.Exp(complex(0, 2*math.Pi*float64(i)/float64(n))) * odd[i]
 		input[i] = even[i] + t
 		input[i+n/2] = even[i] - t
 	}
-
-	// Normaliza os resultados
-	for i := 0; i < n; i++ {
-		input[i] /= complex(float64(n), 0)
-	}
 }
 
-// CalculateInverseFourier calcula a Transformada Inversa de Fourier (IFT) de uma imagem
-// e gera uma imagem com a transformação inversa aplicada.
-func CalculateInverseFourier(img image.Image) image.Image {
-	bounds := img.Bounds()
-	width, height := bounds.Dx(), bounds.Dy()
+// UncenterFFT desloca o espectro de volta ao seu estado original.
+func UncenterFFT(input []complex128, width, height int) []complex128 {
+	uncentered := make([]complex128, len(input))
 
-	// Convert image to grayscale
-	grayscale := image.NewGray(bounds)
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			gray := color.GrayModel.Convert(img.At(x, y)).(color.Gray)
-			grayscale.Set(x, y, gray)
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			newX := (x + width/2) % width
+			newY := (y + height/2) % height
+			uncentered[y*width+x] = input[newY*width+newX]
 		}
 	}
 
-	// Create a 2D slice to hold the grayscale pixel values
+	return uncentered
+}
+
+// CalculateInverseFourier reconstrói a imagem original a partir do espectro.
+func CalculateInverseFourier(spectrumImg image.Image) image.Image {
+	bounds := spectrumImg.Bounds()
+	width, height := bounds.Dx(), bounds.Dy()
+
 	data := make([]complex128, width*height)
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			data[y*width+x] = complex(float64(grayscale.GrayAt(x, y).Y), 0)
+			gray := color.GrayModel.Convert(spectrumImg.At(x, y)).(color.Gray)
+			data[y*width+x] = complex(float64(gray.Y), 0)
 		}
 	}
 
-	// Perform 2D IFFT
-	result := IFFT2D(data, width, height)
+	uncentered := UncenterFFT(data, width, height)
+	reconstructed := IFFT2D(uncentered, width, height)
 
-	// Create a new grayscale image for the result
 	resultImg := image.NewGray(bounds)
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			// Convert complex result to real grayscale value
-			realVal := cmplx.Abs(result[y*width+x])
-			if realVal > 255 {
-				realVal = 255
+			val := real(reconstructed[y*width+x])
+			if val < 0 {
+				val = 0
 			}
-			resultImg.SetGray(x, y, color.Gray{Y: uint8(realVal)})
+			if val > 255 {
+				val = 255
+			}
+			resultImg.SetGray(x, y, color.Gray{Y: uint8(val)})
 		}
 	}
 
