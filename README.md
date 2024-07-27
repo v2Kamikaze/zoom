@@ -29,9 +29,7 @@ Acesse a pasta do projeto e execute:
 go mod tidy
 ```
 
-## Executando o Aplicativo
-
-Escolha a plataforma desejada:
+## Executando:
 
 ```bash
 go run cmd/run/run.go
