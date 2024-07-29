@@ -49,9 +49,27 @@ const Zoom: React.FC = () => {
   const [preview, setPreview] = React.useState("");
   const [processedPreview, setProcessedPreview] = React.useState("");
 
-  // Queries
+  // States for parameters
+  const [kernelSize, setKernelSize] = React.useState(3);
+  const [sigma, setSigma] = React.useState(1.0);
+  const [threshold, setThreshold] = React.useState(128);
+  const [gamma, setGamma] = React.useState(2.0);
+  const [correction, setCorrection] = React.useState(1.0);
+  const [scaleX, setScaleX] = React.useState(1);
+  const [scaleY, setScaleY] = React.useState(1);
   const [angle, setAngle] = React.useState(0);
+  const [highBoostK, setHighBoostK] = React.useState(1.5);
+
+  // Handlers for parameter changes
+  const handleKernelSizeChange = (n: number | null) => setKernelSize(n ?? 3);
+  const handleSigmaChange = (n: number | null) => setSigma(n ?? 1.0);
+  const handleThresholdChange = (n: number | null) => setThreshold(n ?? 128);
+  const handleGammaChange = (n: number | null) => setGamma(n ?? 2.0);
+  const handleCorrectionChange = (n: number | null) => setCorrection(n ?? 1.0);
+  const handleScaleXChange = (n: number | null) => setScaleX(n ?? 1);
+  const handleScaleYChange = (n: number | null) => setScaleY(n ?? 1);
   const handleAngleChange = (n: number | null) => setAngle(n ?? 0);
+  const handleHighBoostKChange = (n: number | null) => setHighBoostK(n ?? 1.5);
 
   const handleFileUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files === null || e.target.files.length === 0) {
@@ -95,34 +113,43 @@ const Zoom: React.FC = () => {
         processed = await ZoomService.applySobelMag(file);
         break;
       case "gaussian":
-        processed = await ZoomService.applyGaussian(file);
+        (processed = await ZoomService.applyGaussian(file)), kernelSize, sigma;
         break;
       case "laplacian":
-        processed = await ZoomService.applyLaplacian(file);
+        processed = await ZoomService.applyLaplacian(file, kernelSize);
         break;
       case "mean":
-        processed = await ZoomService.applyMean(file);
+        processed = await ZoomService.applyMean(file, kernelSize);
         break;
       case "bin":
-        processed = await ZoomService.applyBin(file);
+        processed = await ZoomService.applyBin(file, threshold);
         break;
       case "gamma":
-        processed = await ZoomService.applyGamma(file);
+        processed = await ZoomService.applyGamma(file, gamma, correction);
         break;
       case "high-boost":
-        processed = await ZoomService.applyHighBoost(file);
+        processed = await ZoomService.applyHighBoost(
+          file,
+          kernelSize,
+          sigma,
+          highBoostK
+        );
         break;
       case "sharpening":
-        processed = await ZoomService.applySharpening(file);
+        processed = await ZoomService.applySharpening(file, kernelSize);
         break;
       case "fourier":
         processed = await ZoomService.applyFourier(file);
         break;
       case "scale-bilinear":
-        processed = await ZoomService.applyScaleBilinear(file);
+        processed = await ZoomService.applyScaleBilinear(file, scaleX, scaleY);
         break;
       case "scale-nearest-neighbor":
-        processed = await ZoomService.applyScaleNearestNeighbor(file);
+        processed = await ZoomService.applyScaleNearestNeighbor(
+          file,
+          scaleX,
+          scaleY
+        );
         break;
       case "rotate-bilinear":
         processed = await ZoomService.applyRotateBilinear(file, angle);
@@ -285,58 +312,49 @@ const Zoom: React.FC = () => {
         </Header>
         <Drawer open={drawerOpened} onClose={closeDrawer}>
           <Flex vertical gap="middle">
-            <Flex gap="middle">
-              <Flex gap="middle">
-                <Form.Item label="Tamanho do Kernel" name="ks">
-                  <InputNumber value={angle} onChange={handleAngleChange} />
-                </Form.Item>
-              </Flex>
-            </Flex>
-            <Flex gap="middle">
-              <Form.Item label="Ângulo" name="a">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
+            <Form.Item label="Tamanho do Kernel" name="ks">
+              <InputNumber
+                value={kernelSize}
+                onChange={handleKernelSizeChange}
+              />
+            </Form.Item>
+            <Form.Item label="Ângulo" name="a">
+              <InputNumber value={angle} onChange={handleAngleChange} />
+            </Form.Item>
 
-              <Form.Item label="Escala em X" name="x">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
+            <Form.Item label="Escala em X" name="x">
+              <InputNumber value={scaleX} onChange={handleScaleXChange} />
+            </Form.Item>
 
-              <Form.Item label="Escala em Y" name="y">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
-            </Flex>
+            <Form.Item label="Escala em Y" name="y">
+              <InputNumber value={scaleY} onChange={handleScaleYChange} />
+            </Form.Item>
 
-            <Flex gap="middle">
-              <Form.Item label="Sigma" name="s">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
+            <Form.Item label="Sigma" name="s">
+              <InputNumber value={sigma} onChange={handleSigmaChange} />
+            </Form.Item>
 
-              <Form.Item label="Fator de boost" name="k">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
-            </Flex>
+            <Form.Item label="Fator de boost" name="k">
+              <InputNumber
+                value={highBoostK}
+                onChange={handleHighBoostKChange}
+              />
+            </Form.Item>
 
-            <Flex gap="middle">
-              <Form.Item label="Gamma" name="g">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
+            <Form.Item label="Gamma" name="g">
+              <InputNumber value={gamma} onChange={handleGammaChange} />
+            </Form.Item>
 
-              <Form.Item label="Constante de correção" name="c">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
-            </Flex>
+            <Form.Item label="Constante de correção" name="c">
+              <InputNumber
+                value={correction}
+                onChange={handleCorrectionChange}
+              />
+            </Form.Item>
 
-            <Flex gap="middle">
-              <Form.Item label="Limiar de binarização" name="t">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
-            </Flex>
-
-            <Flex gap="middle">
-              <Form.Item label="Sigma" name="s">
-                <InputNumber value={angle} onChange={handleAngleChange} />
-              </Form.Item>
-            </Flex>
+            <Form.Item label="Limiar de binarização" name="t">
+              <InputNumber value={threshold} onChange={handleThresholdChange} />
+            </Form.Item>
           </Flex>
         </Drawer>
         <Layout>
