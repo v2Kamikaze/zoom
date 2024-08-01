@@ -25,7 +25,7 @@ func main() {
 
 	for _, info := range infos {
 		img := imageio.OpenImage(fmt.Sprintf("./assets/%s.%s", info.name, info.ext))
-		hist := zoom.FromImage(img)
+		hist := zoom.HistogramFromImage(img)
 
 		// runner.Add(func() {
 		// 	//paddImg := utils.PadImagePow2(img)

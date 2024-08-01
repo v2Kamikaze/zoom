@@ -33,5 +33,9 @@ func main() {
 	transform.Post("/rotate/bilinear", handler.RotateImageBilinear)
 	transform.Post("/rotate/nearest-neighbor", handler.RotateImageNearestNeighbor)
 
+	histogram := app.Group("/api/histogram")
+	histogram.Post("/rgbl", handler.HistogramRGBL)
+	histogram.Post("/equalize", handler.HistogramEqualize)
+
 	app.Listen(":8080")
 }

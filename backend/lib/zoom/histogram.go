@@ -9,7 +9,7 @@ import (
 	"github.com/v2Kamikaze/zoom/lib/utils"
 )
 
-type HistogramChannel = uint8
+type HistogramChannel = rune
 
 const (
 	RChannel HistogramChannel = iota
@@ -19,13 +19,13 @@ const (
 )
 
 type Histogram struct {
-	rChannel []uint
-	gChannel []uint
-	bChannel []uint
-	lChannel []uint
+	R []uint `json:"r"`
+	G []uint `json:"g"`
+	B []uint `json:"b"`
+	L []uint `json:"l"`
 }
 
-func FromImage(img image.Image) *Histogram {
+func HistogramFromImage(img image.Image) *Histogram {
 	bounds := img.Bounds()
 	histogramR := make([]uint, 256)
 	histogramG := make([]uint, 256)
@@ -49,27 +49,11 @@ func FromImage(img image.Image) *Histogram {
 	}
 
 	return &Histogram{
-		rChannel: histogramR,
-		gChannel: histogramG,
-		bChannel: histogramB,
-		lChannel: histogramLuminance,
+		R: histogramR,
+		G: histogramG,
+		B: histogramB,
+		L: histogramLuminance,
 	}
-}
-
-func (h *Histogram) RedChannel() []uint {
-	return h.rChannel
-}
-
-func (h *Histogram) GreenChannel() []uint {
-	return h.gChannel
-}
-
-func (h *Histogram) BlueChannel() []uint {
-	return h.bChannel
-}
-
-func (h *Histogram) LuminanceChannel() []uint {
-	return h.lChannel
 }
 
 func (h *Histogram) EqualizeWithChannel(img image.Image, channel HistogramChannel) image.Image {
@@ -80,13 +64,13 @@ func (h *Histogram) EqualizeWithChannel(img image.Image, channel HistogramChanne
 
 	switch channel {
 	case RChannel:
-		selectedHistogram = h.RedChannel()
+		selectedHistogram = h.R
 	case GChannel:
-		selectedHistogram = h.GreenChannel()
+		selectedHistogram = h.G
 	case BChannel:
-		selectedHistogram = h.BlueChannel()
+		selectedHistogram = h.B
 	case LChannel:
-		selectedHistogram = h.LuminanceChannel()
+		selectedHistogram = h.L
 	default:
 		log.Panicf("canal inválido. %d", channel)
 	}
