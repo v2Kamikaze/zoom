@@ -23,10 +23,10 @@ func HistogramRGBL(c *fiber.Ctx) error {
 
 // HistogramEqualize aplica a equalização de histograma em um canal especificado (R, G, B ou luminância) da imagem.
 // Parâmetros:
-// - ch: Canal de cor a ser equalizado ('r', 'g', 'b', 'l'). Padrão: 'r'.
+// - ch: Canal de cor a ser equalizado ('r', 'g', 'b', 'l'). Padrão: 'l'.
 // Retorno: Imagem com o canal equalizado.
 func HistogramEqualize(c *fiber.Ctx) error {
-	ch := c.Query("ch", "r")
+	ch := c.Query("ch", "l")
 
 	return ProcessImage(c, func(img image.Image) image.Image {
 		hist := zoom.HistogramFromImage(img)

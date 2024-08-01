@@ -72,3 +72,5 @@ go run ./cmd/reset .
 | POST   | /api/transform/scale/nearest-neighbor  | query={x: Escala X (padrão 1), y: Escala Y (padrão 1)}                                          | Nova imagem escalada com interpolação por vizinho mais próximo    |
 | POST   | /api/transform/rotate/bilinear         | query={a: Ângulo de rotação (padrão 0)}                                                         | Nova imagem rotacionada com interpolação bilinear                 |
 | POST   | /api/transform/rotate/nearest-neighbor | query={a: Ângulo de rotação (padrão 0)}                                                         | Nova imagem rotacionada com interpolação por vizinho mais próximo |
+| POST   | /api/histogram/rgbl                    | query={}                                                                                        | Retorna os histogramas dos canais R, G, B e L da imagem           |
+| POST   | /api/histogram/equalize                | query={ch: Canal a ser equalizado (padrão 'l', opções: 'r', 'g', 'b', 'l')}                     | Retorna a imagem com o histograma do canal selecionado equalizado |
