@@ -34,21 +34,21 @@ go mod tidy
 Para rodar o servidor:
 
 ```bash
-cd ./backend
+cd ./zoom-back
 go run ./cmd/server .
 ```
 
 Para rodar concorrentemente todos os filtros nas imagens presentes em `assets`(bom para testar):
 
 ```bash
-cd ./backend
+cd ./zoom-back
 go run ./cmd/batch .
 ```
 
 Para limpar as imagens geradas por `batch` em `assets`:
 
 ```bash
-cd ./backend
+cd ./zoom-back
 go run ./cmd/reset .
 ```
 
