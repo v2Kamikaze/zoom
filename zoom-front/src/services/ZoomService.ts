@@ -2,6 +2,15 @@ export type ZoomResponse<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
+export type RGBLChannel = "r" | "g" | "b" | "l";
+
+export type Histogram = {
+  r: number[];
+  g: number[];
+  b: number[];
+  l: number[];
+};
+
 class ZoomService {
   private constructor() {}
 
@@ -32,6 +41,35 @@ class ZoomService {
       const processedFile = new File([blob], file.name, { type: file.type });
 
       return { success: true, data: processedFile };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  private static async uploadImage<T>(
+    endpoint: string,
+    file: File,
+    params: Record<string, string> = {}
+  ): Promise<ZoomResponse<T>> {
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const queryParams = new URLSearchParams(params).toString();
+      const url = `http://localhost:8080${endpoint}?${queryParams}`;
+
+      console.debug("POST", url);
+
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao processar a imagem.");
+      }
+      const data = await response.json();
+      return { success: true, data: data as T };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
@@ -161,6 +199,21 @@ class ZoomService {
   ): Promise<ZoomResponse<File>> {
     return this.processImage("/api/transform/rotate/nearest-neighbor", file, {
       a: a.toString(),
+    });
+  }
+
+  public static async getHistogramRGBL(
+    file: File
+  ): Promise<ZoomResponse<Histogram>> {
+    return this.uploadImage("/api/histogram/rgbl", file);
+  }
+
+  public static async equalizeHistogram(
+    file: File,
+    ch: RGBLChannel
+  ): Promise<ZoomResponse<File>> {
+    return this.processImage("/api/histogram/equalize", file, {
+      ch: ch,
     });
   }
 }

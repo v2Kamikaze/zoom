@@ -8,22 +8,30 @@ import {
   InputNumber,
   Layout,
   Menu,
+  Select,
   Switch,
   theme,
 } from "antd";
 import React from "react";
 import { UploadFile } from "./components/UploadFile";
-import ZoomService, { ZoomResponse } from "./services/ZoomService";
+import ZoomService, {
+  Histogram,
+  RGBLChannel,
+  ZoomResponse,
+} from "./services/ZoomService";
 import {
   UploadOutlined,
   SwapOutlined,
   BgColorsOutlined,
   ArrowsAltOutlined,
   RedoOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
 import { useNotification } from "./hooks/useNotification";
+import HistogramCharts from "./components/HistogramCharts";
 
 const { Sider, Content, Header } = Layout;
+const { Option } = Select;
 
 const Zoom: React.FC = () => {
   // Theme
@@ -46,6 +54,13 @@ const Zoom: React.FC = () => {
   const [file, setFile] = React.useState<File>(new File([], ""));
   const [processedFile, setProcessedFile] = React.useState<File>(file);
 
+  const [histogram, setHistogram] = React.useState<Histogram>({
+    r: [],
+    g: [],
+    b: [],
+    l: [],
+  });
+
   const [preview, setPreview] = React.useState("");
   const [processedPreview, setProcessedPreview] = React.useState("");
 
@@ -59,6 +74,7 @@ const Zoom: React.FC = () => {
   const [scaleY, setScaleY] = React.useState(1);
   const [angle, setAngle] = React.useState(0);
   const [highBoostK, setHighBoostK] = React.useState(1.5);
+  const [channel, setChannel] = React.useState<RGBLChannel>("l");
 
   // Handlers for parameter changes
   const handleKernelSizeChange = (n: number | null) => setKernelSize(n ?? 3);
@@ -70,6 +86,7 @@ const Zoom: React.FC = () => {
   const handleScaleYChange = (n: number | null) => setScaleY(n ?? 1);
   const handleAngleChange = (n: number | null) => setAngle(n ?? 0);
   const handleHighBoostKChange = (n: number | null) => setHighBoostK(n ?? 1.5);
+  const handleChannelChange = (ch: RGBLChannel) => setChannel(ch);
 
   const handleFileUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files === null || e.target.files.length === 0) {
@@ -113,7 +130,7 @@ const Zoom: React.FC = () => {
         processed = await ZoomService.applySobelMag(file);
         break;
       case "gaussian":
-        (processed = await ZoomService.applyGaussian(file)), kernelSize, sigma;
+        processed = await ZoomService.applyGaussian(file, kernelSize, sigma);
         break;
       case "laplacian":
         processed = await ZoomService.applyLaplacian(file, kernelSize);
@@ -157,7 +174,9 @@ const Zoom: React.FC = () => {
       case "rotate-nearest-neighbor":
         processed = await ZoomService.applyRotateNearestNeighbor(file, angle);
         break;
-
+      case "equalize":
+        processed = await ZoomService.equalizeHistogram(file, channel);
+        break;
       default:
         openNotification("error", "Opção inválida");
         return;
@@ -172,6 +191,16 @@ const Zoom: React.FC = () => {
       reader.readAsDataURL(processed.data);
     } else {
       openNotification("error", processed.error);
+    }
+  };
+
+  const generateHistogram = async () => {
+    const histogram = await ZoomService.getHistogramRGBL(file);
+
+    if (histogram.success) {
+      setHistogram(histogram.data);
+    } else {
+      openNotification("error", histogram.error);
     }
   };
 
@@ -284,6 +313,19 @@ const Zoom: React.FC = () => {
       label: "Rotate Nearest Neighbor",
       onClick: () => applyEffect("rotate-nearest-neighbor"),
     },
+
+    {
+      key: "equalize",
+      icon: <RedoOutlined />,
+      label: "Equalize image",
+      onClick: () => applyEffect("equalize"),
+    },
+    {
+      key: "histogram",
+      icon: <BarChartOutlined />,
+      label: "Generate Histogram RGBL",
+      onClick: () => generateHistogram(),
+    },
   ];
 
   return (
@@ -296,20 +338,17 @@ const Zoom: React.FC = () => {
       <Layout
         style={{ minHeight: "100vh", maxHeight: "100vh", minWidth: "100vw" }}
       >
-        <Header className="flex items-center justify-between">
-          <span className="text-white text-lg font-bold">Zoom</span>
-          <Flex align="center" justify="center" gap="middle">
-            <Button type="primary" onClick={openDrawer}>
-              Parâmetros
-            </Button>
-            <Switch
-              value={isDarkMode}
-              checkedChildren="Tema claro"
-              unCheckedChildren="Tema escuro"
-              onChange={toggleTheme}
-            />
-          </Flex>
-        </Header>
+        <Sider
+          width={300}
+          collapsed={siderOpened}
+          collapsible
+          onCollapse={toggleSider}
+          breakpoint="lg"
+          theme={themeType}
+        >
+          <Menu theme={themeType} mode="inline" items={menuItems} />
+        </Sider>
+
         <Drawer open={drawerOpened} onClose={closeDrawer}>
           <Flex vertical gap="middle">
             <Form.Item label="Tamanho do Kernel" name="ks">
@@ -355,42 +394,59 @@ const Zoom: React.FC = () => {
             <Form.Item label="Limiar de binarização" name="t">
               <InputNumber value={threshold} onChange={handleThresholdChange} />
             </Form.Item>
+
+            <Form.Item label="Canal" name="channel">
+              <Select value={channel} onChange={handleChannelChange}>
+                <Option value="r">R</Option>
+                <Option value="g">G</Option>
+                <Option value="b">B</Option>
+                <Option value="l">L</Option>
+              </Select>
+            </Form.Item>
           </Flex>
         </Drawer>
         <Layout>
-          <Sider
-            width={300}
-            collapsed={siderOpened}
-            collapsible
-            onCollapse={toggleSider}
-            breakpoint="lg"
-            theme={themeType}
-          >
-            <Menu theme={themeType} mode="inline" items={menuItems} />
-          </Sider>
+          <Header className="flex items-center justify-between">
+            <span className="text-white text-lg font-bold">Zoom</span>
+            <Flex align="center" justify="center" gap="middle">
+              <Button type="primary" onClick={openDrawer}>
+                Parâmetros
+              </Button>
+              <Switch
+                value={isDarkMode}
+                checkedChildren="Tema claro"
+                unCheckedChildren="Tema escuro"
+                onChange={toggleTheme}
+              />
+            </Flex>
+          </Header>
           <Content>
             <Flex
+              vertical
               align="center"
               justify="center"
               gap="large"
               className="h-full"
             >
-              <Image
-                src={preview}
-                fallback="https://placehold.co/600x400"
-                className="object-cover w-full"
-              />
-              <Button
-                size="large"
-                type="primary"
-                onClick={invert}
-                icon={<SwapOutlined />}
-              />
-              <Image
-                src={processedPreview}
-                fallback="https://placehold.co/600x400"
-                className="object-cover w-full"
-              />
+              <HistogramCharts histogram={histogram} />
+              <Flex align="center" justify="center">
+                <Image
+                  src={preview}
+                  fallback="https://placehold.co/600x400"
+                  className="object-cover w-1/2"
+                />
+                <Button
+                  size="large"
+                  type="primary"
+                  onClick={invert}
+                  icon={<SwapOutlined />}
+                />
+                <Image
+                  src={processedPreview}
+                  fallback="https://placehold.co/600x400"
+                  className="object-cover w-1/2"
+                />
+              </Flex>
             </Flex>
           </Content>
         </Layout>
