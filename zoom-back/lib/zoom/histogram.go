@@ -4,7 +4,6 @@ import (
 	"image"
 	"image/color"
 	"log"
-	"math"
 
 	"github.com/v2Kamikaze/zoom/lib/utils"
 )
@@ -44,7 +43,6 @@ func HistogramFromImage(img image.Image) *Histogram {
 
 			luminance := utils.ToGrayRGB(r, g, b)
 			histogramLuminance[luminance]++
-
 		}
 	}
 
@@ -85,7 +83,7 @@ func (h *Histogram) EqualizeWithChannel(img image.Image, channel HistogramChanne
 
 	cdfMin := cdf[0]
 	for i := 0; i < 256; i++ {
-		cdf[i] = math.Round((cdf[i] - cdfMin) * 255)
+		cdf[i] = ((cdf[i] - cdfMin) / (1.0 - cdfMin)) * 255
 	}
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
