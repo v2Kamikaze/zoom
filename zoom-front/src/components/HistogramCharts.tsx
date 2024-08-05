@@ -1,7 +1,7 @@
 import React from "react";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -26,48 +26,48 @@ const HistogramCharts: React.FC<HistogramProps> = ({ histogram }) => {
 
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-      <ResponsiveContainer width="25%" height={150}>
-        <LineChart data={dataR}>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={dataR}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="index" />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="value" stroke="#ff0000" />
-        </LineChart>
+          <Bar dataKey="value" fill="#ff0000" />
+        </BarChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer width="25%" height={150}>
-        <LineChart data={dataG}>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={dataG}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="index" />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="value" stroke="#00ff00" />
-        </LineChart>
+          <Bar dataKey="value" fill="#00ff00" />
+        </BarChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer width="25%" height={150}>
-        <LineChart data={dataB}>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={dataB}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="index" />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="value" stroke="#0000ff" />
-        </LineChart>
+          <Bar dataKey="value" fill="#0000ff" />
+        </BarChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer width="25%" height={150}>
-        <LineChart data={dataL}>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={dataL}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="index" />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="value" stroke="#808080" />
-        </LineChart>
+          <Bar dataKey="value" fill="#808080" />
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );

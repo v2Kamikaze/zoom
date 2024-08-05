@@ -8,6 +8,7 @@ import {
   InputNumber,
   Layout,
   Menu,
+  Modal,
   Select,
   Switch,
   theme,
@@ -29,6 +30,7 @@ import {
 } from "@ant-design/icons";
 import { useNotification } from "./hooks/useNotification";
 import HistogramCharts from "./components/HistogramCharts";
+import ColorConverter from "./components/ColorConverter";
 
 const { Sider, Content, Header } = Layout;
 const { Option } = Select;
@@ -53,6 +55,9 @@ const Zoom: React.FC = () => {
   // Data States
   const [file, setFile] = React.useState<File>(new File([], ""));
   const [processedFile, setProcessedFile] = React.useState<File>(file);
+
+  const [histogramModalOpen, setHistogramModalOpen] = React.useState(false);
+  const [colorModalOpen, setColorModalOpen] = React.useState(false);
 
   const [histogram, setHistogram] = React.useState<Histogram>({
     r: [],
@@ -199,6 +204,7 @@ const Zoom: React.FC = () => {
 
     if (histogram.success) {
       setHistogram(histogram.data);
+      setHistogramModalOpen(true);
     } else {
       openNotification("error", histogram.error);
     }
@@ -338,6 +344,23 @@ const Zoom: React.FC = () => {
       <Layout
         style={{ minHeight: "100vh", maxHeight: "100vh", minWidth: "100vw" }}
       >
+        <Modal
+          open={histogramModalOpen}
+          width="80%"
+          onCancel={() => setHistogramModalOpen(false)}
+          footer={null}
+        >
+          <HistogramCharts histogram={histogram} />
+        </Modal>
+
+        <Modal
+          open={colorModalOpen}
+          width="80%"
+          onCancel={() => setColorModalOpen(false)}
+          footer={null}
+        >
+          <ColorConverter />
+        </Modal>
         <Sider
           width={300}
           collapsed={siderOpened}
@@ -409,6 +432,9 @@ const Zoom: React.FC = () => {
           <Header className="flex items-center justify-between">
             <span className="text-white text-lg font-bold">Zoom</span>
             <Flex align="center" justify="center" gap="middle">
+              <Button type="primary" onClick={() => setColorModalOpen(true)}>
+                Cores
+              </Button>
               <Button type="primary" onClick={openDrawer}>
                 Parâmetros
               </Button>
@@ -428,7 +454,6 @@ const Zoom: React.FC = () => {
               gap="large"
               className="h-full"
             >
-              <HistogramCharts histogram={histogram} />
               <Flex align="center" justify="center">
                 <Image
                   src={preview}
