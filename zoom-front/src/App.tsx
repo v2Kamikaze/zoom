@@ -322,7 +322,7 @@ const Zoom: React.FC = () => {
 
     {
       key: "equalize",
-      icon: <RedoOutlined />,
+      icon: <BarChartOutlined />,
       label: "Equalize image",
       onClick: () => applyEffect("equalize"),
     },
