@@ -454,7 +454,7 @@ const Zoom: React.FC = () => {
               gap="large"
               className="h-full"
             >
-              <Flex align="center" justify="center">
+              <Flex align="center" justify="center" gap="middle">
                 <Image
                   src={preview}
                   fallback="https://placehold.co/600x400"
